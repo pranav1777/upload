@@ -1,25 +1,30 @@
-# ---- Builder image ----
-FROM openjdk:17-jdk-slim AS builder
+# ---- Stage 1: Build ----
+FROM openjdk:21-jdk-slim AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Copy project files and build the jar
+# Copy everything
 COPY . .
-# Use the maven wrapper inside the container; the wrapper script is Unix executable in the repo
+
+# Make mvnw executable
+RUN chmod +x mvnw
+
+# Build the jar
 RUN ./mvnw clean package -DskipTests
 
-# ---- Run image ----
-FROM openjdk:17-jdk-slim
+# ---- Stage 2: Run ----
+FROM openjdk:21-jdk-slim
+
 WORKDIR /app
 
-# Copy built JAR from builder stage
+# Copy jar from builder
 COPY --from=builder /app/target/*.jar app.jar
 
 # Expose port
 EXPOSE 8080
 
-# Default env
+# Set Spring profile
 ENV SPRING_PROFILES_ACTIVE=prod
 
+# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
