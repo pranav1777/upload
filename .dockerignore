@@ -1,0 +1,14 @@
+target
+.git
+.idea
+.vscode
+*.iml
+*.log
+*.jar
+*.war
+node_modules
+.classpath
+.project
+.settings
+.cache
+src/main/resources/application-local.properties
